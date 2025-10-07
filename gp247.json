@@ -1,0 +1,14 @@
+{
+    "name": "LoginSocial module",
+    "image": "images/login-social.jpg",
+    "auth": "GP247",
+    "email": "support@gp247.net",
+    "link": "https://GP247.net",
+    "configGroup": "Plugins",
+    "configCode": "LoginSocial",
+    "configKey": "LoginSocial",
+    "version": "1.0",
+    "requireCore": ["1.2"],
+    "requirePackages": ["laravel/socialite"],
+    "requireExtensions": []
+}
