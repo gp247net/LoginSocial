@@ -119,7 +119,134 @@ composer require laravel/socialite
 </a>
 ```
 
-### Ví dụ hoàn chỉnh trong Login Form
+### Sử dụng Render Component (Khuyến nghị)
+
+#### Tham số của Render Component
+
+| Tham số | Kiểu | Mặc định | Mô tả |
+|---------|------|----------|-------|
+| `guard` | string | `'customer'` | Guard xác thực (admin, customer, vendor, pmo) |
+| `providers` | array | `['facebook', 'google', 'github']` | Danh sách providers hiển thị |
+| `buttonClass` | string | `'btn btn-block mb-2'` | CSS class cho các nút |
+| `title` | boolean | `false` | Hiển thị tiêu đề "Đăng nhập mạng xã hội" |
+| `description` | boolean | `false` | Hiển thị mô tả "Đăng nhập nhanh bằng tài khoản mạng xã hội" |
+| `forceShow` | boolean | `false` | Hiển thị ngay cả khi user đã đăng nhập |
+
+**Lưu ý**: Mặc định, nút đăng nhập mạng xã hội chỉ hiển thị khi user **chưa đăng nhập** cho guard được chỉ định. Sử dụng `forceShow=true` để luôn hiển thị.
+
+#### Cách 1: Sử dụng @include với render.blade.php
+
+```blade
+<!-- Cách đơn giản nhất -->
+@include('Plugins/LoginSocial::render')
+
+<!-- Với tùy chỉnh guard -->
+@include('Plugins/LoginSocial::render', ['guard' => 'customer'])
+
+<!-- Với tùy chỉnh providers -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'providers' => ['facebook', 'google', 'github']
+])
+
+<!-- Với tùy chỉnh button class -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'providers' => ['facebook', 'google'],
+    'buttonClass' => 'btn btn-outline-primary btn-block'
+])
+
+<!-- Với title và description -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'title' => true,
+    'description' => true
+])
+
+<!-- Luôn hiển thị (ngay cả khi đã đăng nhập) -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'forceShow' => true
+])
+```
+
+#### Cách 2: Sử dụng trong Login Form
+
+```blade
+<!-- Form đăng nhập thông thường -->
+<form method="POST" action="{{ route('login') }}">
+    @csrf
+    <div class="form-group">
+        <input type="email" name="email" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Đăng nhập</button>
+</form>
+
+<!-- Phần đăng nhập mạng xã hội -->
+@if(gp247_extension_check_active('Plugins', 'LoginSocial'))
+    @include('Plugins/LoginSocial::render', [
+        'guard' => 'customer',
+        'title' => true,
+        'description' => true
+    ])
+@endif
+```
+
+#### Cách 3: Sử dụng cho Admin Login
+
+```blade
+<!-- Admin login form -->
+<form method="POST" action="{{ route('admin.login') }}">
+    @csrf
+    <div class="form-group">
+        <input type="email" name="email" class="form-control" placeholder="Admin Email" required>
+    </div>
+    <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Admin Login</button>
+</form>
+
+<!-- Social login cho admin -->
+@if(gp247_extension_check_active('Plugins', 'LoginSocial'))
+    @include('Plugins/LoginSocial::render', [
+        'guard' => 'admin',
+        'providers' => ['google', 'github'],
+        'title' => true
+    ])
+@endif
+```
+
+#### Cách 4: Sử dụng cho Vendor Login
+
+```blade
+<!-- Vendor login form -->
+<form method="POST" action="{{ route('vendor.login') }}">
+    @csrf
+    <div class="form-group">
+        <input type="email" name="email" class="form-control" placeholder="Vendor Email" required>
+    </div>
+    <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Mật khẩu" required>
+    </div>
+    <button type="submit" class="btn btn-success btn-block">Vendor Login</button>
+</form>
+
+<!-- Social login cho vendor -->
+@if(gp247_extension_check_active('Plugins', 'LoginSocial'))
+    @include('Plugins/LoginSocial::render', [
+        'guard' => 'vendor',
+        'providers' => ['facebook', 'google'],
+        'title' => true,
+        'description' => true
+    ])
+@endif
+```
+
+### Ví dụ hoàn chỉnh trong Login Form (Manual)
 
 ```blade
 <div class="social-login-buttons">

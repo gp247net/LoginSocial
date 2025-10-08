@@ -119,7 +119,134 @@ composer require laravel/socialite
 </a>
 ```
 
-### Complete Example in Login Form
+### Using Render Component (Recommended)
+
+#### Render Component Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `guard` | string | `'customer'` | Authentication guard (admin, customer, vendor, pmo) |
+| `providers` | array | `['facebook', 'google', 'github']` | List of providers to display |
+| `buttonClass` | string | `'btn btn-block mb-2'` | CSS class for buttons |
+| `title` | boolean | `false` | Show title "Social Login" |
+| `description` | boolean | `false` | Show description "Quick login with your social media accounts" |
+| `forceShow` | boolean | `false` | Show even if user is already logged in |
+
+**Note**: By default, social login buttons only show when user is **NOT logged in** for the specified guard. Use `forceShow=true` to always show the buttons.
+
+#### Method 1: Using @include with render.blade.php
+
+```blade
+<!-- Simplest way -->
+@include('Plugins/LoginSocial::render')
+
+<!-- With custom guard -->
+@include('Plugins/LoginSocial::render', ['guard' => 'customer'])
+
+<!-- With custom providers -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'providers' => ['facebook', 'google', 'github']
+])
+
+<!-- With custom button class -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'providers' => ['facebook', 'google'],
+    'buttonClass' => 'btn btn-outline-primary btn-block'
+])
+
+<!-- With title and description -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'title' => true,
+    'description' => true
+])
+
+<!-- Always show (even if logged in) -->
+@include('Plugins/LoginSocial::render', [
+    'guard' => 'customer',
+    'forceShow' => true
+])
+```
+
+#### Method 2: Using in Login Form
+
+```blade
+<!-- Regular login form -->
+<form method="POST" action="{{ route('login') }}">
+    @csrf
+    <div class="form-group">
+        <input type="email" name="email" class="form-control" placeholder="Email" required>
+    </div>
+    <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Login</button>
+</form>
+
+<!-- Social login section -->
+@if(gp247_extension_check_active('Plugins', 'LoginSocial'))
+    @include('Plugins/LoginSocial::render', [
+        'guard' => 'customer',
+        'title' => true,
+        'description' => true
+    ])
+@endif
+```
+
+#### Method 3: Using for Admin Login
+
+```blade
+<!-- Admin login form -->
+<form method="POST" action="{{ route('admin.login') }}">
+    @csrf
+    <div class="form-group">
+        <input type="email" name="email" class="form-control" placeholder="Admin Email" required>
+    </div>
+    <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Admin Login</button>
+</form>
+
+<!-- Social login for admin -->
+@if(gp247_extension_check_active('Plugins', 'LoginSocial'))
+    @include('Plugins/LoginSocial::render', [
+        'guard' => 'admin',
+        'providers' => ['google', 'github'],
+        'title' => true
+    ])
+@endif
+```
+
+#### Method 4: Using for Vendor Login
+
+```blade
+<!-- Vendor login form -->
+<form method="POST" action="{{ route('vendor.login') }}">
+    @csrf
+    <div class="form-group">
+        <input type="email" name="email" class="form-control" placeholder="Vendor Email" required>
+    </div>
+    <div class="form-group">
+        <input type="password" name="password" class="form-control" placeholder="Password" required>
+    </div>
+    <button type="submit" class="btn btn-success btn-block">Vendor Login</button>
+</form>
+
+<!-- Social login for vendor -->
+@if(gp247_extension_check_active('Plugins', 'LoginSocial'))
+    @include('Plugins/LoginSocial::render', [
+        'guard' => 'vendor',
+        'providers' => ['facebook', 'google'],
+        'title' => true,
+        'description' => true
+    ])
+@endif
+```
+
+### Complete Example in Login Form (Manual)
 
 ```blade
 <div class="social-login-buttons">
