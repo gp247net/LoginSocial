@@ -83,6 +83,69 @@ composer require laravel/socialite
 
 > **Important**: All configurations are stored in database, no ENV variables setup required.
 
+## Security Configuration
+
+### Guards Configuration
+
+For security reasons, **only the `customer` guard is enabled by default**. This prevents unauthorized social login access to administrative or sensitive areas of your system.
+
+#### Enabled Guards
+
+The admin interface shows the status of each guard:
+- 🟢 **Green badge with ✓** = Guard is enabled and available for social login
+- ⚫ **Gray badge with ✗** = Guard is disabled (social login not allowed)
+
+#### Enabling Other Guards
+
+If you need to enable social login for other guards (admin, vendor, pmo), you must manually configure them in the config file:
+
+**File**: `app/GP247/Plugins/LoginSocial/config.php`
+
+```php
+'guards' => [
+    'admin' => [
+        'model' => '\GP247\Core\Models\AdminUser',
+        'redirect_after_login' => 'admin.home',
+        'table' => 'users',
+        'enabled' => 1, // Change from 0 to 1 to enable
+        'status_default' => 0, // Default status for new users (0=inactive, 1=active)
+    ],
+    'customer' => [
+        'model' => '\GP247\Shop\Models\ShopCustomer',
+        'redirect_after_login' => 'front.home',
+        'table' => 'shop_customer',
+        'enabled' => 1, // Already enabled by default
+        'status_default' => 1, // New customers are active by default
+    ],
+    'vendor' => [
+        'model' => '\App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
+        'redirect_after_login' => 'vendor_admin.home',
+        'table' => 'vendor_users',
+        'enabled' => 0, // Disabled by default
+        'status_default' => 0, // New vendors require approval
+    ],
+    // ... other guards
+],
+```
+
+#### Configuration Parameters
+
+- **`enabled`**: `1` = Allow social login for this guard, `0` = Disable social login
+- **`status_default`**: Default status for newly created users (0 = inactive/requires approval, 1 = active immediately)
+- **`model`**: User model class for this guard
+- **`redirect_after_login`**: Route name to redirect after successful login
+- **`table`**: Database table name
+
+> ⚠️ **Security Warning**: Enabling social login for admin, vendor, or other privileged guards poses security risks. Only enable if you understand the implications and have proper security measures in place.
+
+### Best Practices
+
+1. **Keep admin guard disabled** unless absolutely necessary
+2. **Set `status_default` to 0** for privileged guards (require manual approval)
+3. **Monitor social login activity** in your logs
+4. **Implement additional verification** for sensitive guards
+5. **Review guard configurations** regularly
+
 ## Usage
 
 ### Add Social Login Buttons to Template
@@ -285,23 +348,6 @@ The plugin supports the following guards:
 - **customer**: Login for customers (default)
 - **vendor**: Login for vendors (requires MultiVendorPro plugin)
 - **pmo**: Login for PMO users
-
-## Database Structure
-
-### social_accounts Table
-The plugin creates a `social_accounts` table with the structure:
-
-```sql
-- id (bigint)
-- user_type (string) - Guard type: admin, customer, vendor, pmo
-- user_id (bigint) - User ID in the corresponding table
-- provider (string) - Provider name: facebook, google, github
-- provider_id (string) - User ID from provider
-- avatar (string) - Avatar URL from provider
-- created_at (timestamp)
-- updated_at (timestamp)
-```
-
 
 ## Workflow
 

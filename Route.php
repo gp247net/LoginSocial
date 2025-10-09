@@ -14,14 +14,14 @@ if(gp247_extension_check_active($config['configGroup'], $config['configKey'])) {
             'namespace' => 'App\GP247\Plugins\LoginSocial\Controllers',
         ],
         function () {
+            // Provider callback - MUST be defined before the redirect route
+            Route::get('{provider}/callback', 'SocialAuthController@handleProviderCallback')
+                ->name('social.callback')
+                ->where('provider', 'facebook|google|github');
+            
             // Redirect to provider
             Route::get('{provider}/{guard?}', 'SocialAuthController@redirectToProvider')
                 ->name('social.redirect')
-                ->where('provider', 'facebook|google|github');
-            
-            // Provider callback
-            Route::get('{provider}/callback', 'SocialAuthController@handleProviderCallback')
-                ->name('social.callback')
                 ->where('provider', 'facebook|google|github');
         }
     );

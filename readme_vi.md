@@ -83,6 +83,69 @@ composer require laravel/socialite
 
 > **Quan trọng**: Tất cả cấu hình được lưu trong database, không cần thiết lập ENV variables.
 
+## Cấu Hình Bảo Mật
+
+### Cấu Hình Guards
+
+Vì lý do bảo mật, **mặc định chỉ guard `customer` được bật**. Điều này ngăn chặn việc truy cập trái phép vào các khu vực quản trị hoặc nhạy cảm của hệ thống thông qua đăng nhập social.
+
+#### Trạng Thái Guards
+
+Giao diện admin hiển thị trạng thái của mỗi guard:
+- 🟢 **Badge màu xanh với ✓** = Guard đã được bật và có thể sử dụng đăng nhập social
+- ⚫ **Badge màu xám với ✗** = Guard đã bị tắt (không cho phép đăng nhập social)
+
+#### Bật Guards Khác
+
+Nếu bạn cần bật đăng nhập social cho các guard khác (admin, vendor, pmo), bạn phải cấu hình thủ công trong file config:
+
+**File**: `app/GP247/Plugins/LoginSocial/config.php`
+
+```php
+'guards' => [
+    'admin' => [
+        'model' => '\GP247\Core\Models\AdminUser',
+        'redirect_after_login' => 'admin.home',
+        'table' => 'users',
+        'enabled' => 1, // Đổi từ 0 sang 1 để bật
+        'status_default' => 0, // Trạng thái mặc định cho user mới (0=chưa kích hoạt, 1=đã kích hoạt)
+    ],
+    'customer' => [
+        'model' => '\GP247\Shop\Models\ShopCustomer',
+        'redirect_after_login' => 'front.home',
+        'table' => 'shop_customer',
+        'enabled' => 1, // Đã được bật mặc định
+        'status_default' => 1, // Customer mới được kích hoạt ngay
+    ],
+    'vendor' => [
+        'model' => '\App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
+        'redirect_after_login' => 'vendor_admin.home',
+        'table' => 'vendor_users',
+        'enabled' => 0, // Tắt mặc định
+        'status_default' => 0, // Vendor mới cần được duyệt
+    ],
+    // ... các guards khác
+],
+```
+
+#### Các Tham Số Cấu Hình
+
+- **`enabled`**: `1` = Cho phép đăng nhập social cho guard này, `0` = Tắt đăng nhập social
+- **`status_default`**: Trạng thái mặc định cho user mới tạo (0 = chưa kích hoạt/cần duyệt, 1 = kích hoạt ngay)
+- **`model`**: Class model của user cho guard này
+- **`redirect_after_login`**: Tên route để chuyển hướng sau khi đăng nhập thành công
+- **`table`**: Tên bảng trong database
+
+> ⚠️ **Cảnh Báo Bảo Mật**: Việc bật đăng nhập social cho admin, vendor hoặc các guard có quyền cao khác có thể gây rủi ro bảo mật. Chỉ bật khi bạn hiểu rõ hậu quả và đã có các biện pháp bảo mật phù hợp.
+
+### Thực Hành Tốt Nhất
+
+1. **Giữ guard admin ở trạng thái tắt** trừ khi thực sự cần thiết
+2. **Đặt `status_default` là 0** cho các guard có quyền cao (yêu cầu duyệt thủ công)
+3. **Theo dõi hoạt động đăng nhập social** trong logs của bạn
+4. **Triển khai xác thực bổ sung** cho các guard nhạy cảm
+5. **Xem xét cấu hình guards** thường xuyên
+
 ## Sử dụng
 
 ### Thêm nút đăng nhập Social vào template
@@ -285,23 +348,6 @@ Plugin hỗ trợ các guards sau:
 - **customer**: Đăng nhập cho khách hàng (mặc định)
 - **vendor**: Đăng nhập cho nhà cung cấp (yêu cầu MultiVendorPro plugin)
 - **pmo**: Đăng nhập cho PMO users
-
-## Cấu trúc Database
-
-### Bảng social_accounts
-Plugin tạo bảng `social_accounts` với cấu trúc:
-
-```sql
-- id (bigint)
-- user_type (string) - Loại guard: admin, customer, vendor, pmo
-- user_id (bigint) - ID người dùng trong bảng tương ứng
-- provider (string) - Tên provider: facebook, google, github
-- provider_id (string) - ID người dùng từ provider
-- avatar (string) - URL avatar từ provider
-- created_at (timestamp)
-- updated_at (timestamp)
-```
-
 
 ## Luồng xử lý
 

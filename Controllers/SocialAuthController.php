@@ -38,6 +38,14 @@ class SocialAuthController extends RootFrontController
                 return redirect()->back()->with('error', gp247_language_render('Plugins/LoginSocial::lang.provider_not_enabled'));
             }
 
+            // Check if the guard is enabled
+            $guard = $guard ?? config('Plugins/LoginSocial.default_guard');
+            $guardConfig = config('Plugins/LoginSocial.guards.' . $guard);
+
+            if (empty($guardConfig) || empty($guardConfig['enabled']) || !$guardConfig['enabled']) {
+                return redirect()->back()->with('error', gp247_language_render('Plugins/LoginSocial::lang.guard_not_enabled'));
+            }
+
             // Store guard in session for callback
             $guard = $guard ?? config('Plugins/LoginSocial.default_guard');
             session(['socialite_guard' => $guard]);
@@ -51,7 +59,7 @@ class SocialAuthController extends RootFrontController
 
             return Socialite::driver($provider)->redirect();
             
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             gp247_report('LoginSocial: Redirect to provider failed: ' . $e->getMessage());
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -70,7 +78,7 @@ class SocialAuthController extends RootFrontController
             $providerConfig = \App\GP247\Plugins\LoginSocial\Helpers\ProviderConfig::getProviderConfig($provider);
             
             if (!$providerConfig['enabled']) {
-                return redirect()->route('login')->with('error', gp247_language_render('Plugins/LoginSocial::lang.provider_not_enabled'));
+                return redirect('/')->with('error', gp247_language_render('Plugins/LoginSocial::lang.provider_not_enabled'));
             }
 
             // Configure socialite
@@ -88,7 +96,7 @@ class SocialAuthController extends RootFrontController
             $guardConfig = config('Plugins/LoginSocial.guards.' . $guard);
 
             if (!$guardConfig) {
-                return redirect()->route('login')->with('error', gp247_language_render('Plugins/LoginSocial::lang.invalid_guard'));
+                return redirect('/')->with('error', gp247_language_render('Plugins/LoginSocial::lang.invalid_guard'));
             }
 
             // Find or create social account
@@ -105,7 +113,7 @@ class SocialAuthController extends RootFrontController
                     $this->loginUser($guard, $user);
                     return redirect()->route($guardConfig['redirect_after_login']);
                 } else {
-                    return redirect()->route('login')->with('error', gp247_language_render('Plugins/LoginSocial::lang.account_inactive'));
+                    return redirect($this->getRedirectUrl($guard))->with('error', gp247_language_render('Plugins/LoginSocial::lang.account_inactive'));
                 }
             } else {
                 // Check if user exists by email
@@ -126,7 +134,7 @@ class SocialAuthController extends RootFrontController
                         $this->loginUser($guard, $user);
                         return redirect()->route($guardConfig['redirect_after_login']);
                     } else {
-                        return redirect()->route('login')->with('error', gp247_language_render('Plugins/LoginSocial::lang.account_inactive'));
+                        return redirect($this->getRedirectUrl($guard))->with('error', gp247_language_render('Plugins/LoginSocial::lang.account_inactive'));
                     }
                 } else {
                     // Create new user
@@ -145,13 +153,13 @@ class SocialAuthController extends RootFrontController
                         $this->loginUser($guard, $newUser);
                         return redirect()->route($guardConfig['redirect_after_login']);
                     } else {
-                        return redirect()->route('login')->with('error', gp247_language_render('Plugins/LoginSocial::lang.create_user_failed'));
+                        return redirect($this->getRedirectUrl($guard))->with('error', gp247_language_render('Plugins/LoginSocial::lang.create_user_failed'));
                     }
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             gp247_report('LoginSocial: Handle provider callback failed: ' . $e->getMessage());
-            return redirect()->route('login')->with('error', $e->getMessage());
+            return redirect('/')->with('error', $e->getMessage());
         }
     }
 
@@ -182,18 +190,23 @@ class SocialAuthController extends RootFrontController
         $guardConfig = config('Plugins/LoginSocial.guards.' . $guard);
         $modelClass = $guardConfig['model'];
 
+        $name = $providerUser->getName() ?? $providerUser->getNickname();
+        $status = $guardConfig['status_default'];
         $userData = [
             'email' => $providerUser->getEmail(),
-            'name' => $providerUser->getName() ?? $providerUser->getNickname(),
             'password' => Hash::make(Str::random(16)), // Random password
-            'status' => 1,
+            'status' => $status,
         ];
 
         // Handle specific fields for different guards
-        if ($guard === 'customer') {
-            $userData['first_name'] = $providerUser->getName() ?? '';
-            $userData['last_name'] = '';
-            unset($userData['name']);
+        if ($guard === 'customer' || $guard === 'vendor') {
+            $userData['first_name'] = $name;
+        }
+        if ($guard === 'admin' || $guard === 'pmo') {
+            $userData['name'] = $name;
+        }
+        if ($guard === 'admin') {
+            $userData['username'] = $providerUser->getEmail();
         }
 
         return $modelClass::create($userData);
@@ -208,16 +221,12 @@ class SocialAuthController extends RootFrontController
      */
     protected function loginUser($guard, $user)
     {
-        if ($guard === 'customer') {
-            // For customer guard, use customer authentication
-            session(['customer' => $user->id]);
-            session(['customerAuth' => $user->id]);
-        } elseif ($guard === 'vendor') {
-            // For vendor guard
-            Auth::guard('vendor')->login($user);
-        } else {
-            // For other guards (admin, pmo, etc.)
-            Auth::guard($guard)->login($user);
-        }
+        Auth::guard($guard)->login($user);
+    }
+
+    protected function getRedirectUrl($guard)
+    {
+        $guardConfig = config('Plugins/LoginSocial.guards.' . $guard);
+        return route($guardConfig['redirect_after_login']);
     }
 }

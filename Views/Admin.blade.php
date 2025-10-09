@@ -37,7 +37,21 @@
                         <label>{{ gp247_language_render('Plugins/LoginSocial::lang.admin.available_guards') }}</label>
                         <div class="alert alert-secondary">
                             @foreach($guards as $guard)
-                                <span class="badge badge-info">{{ $guard }}</span>
+                                @php
+                                    $guardConfig = config('Plugins/LoginSocial.guards.' . $guard);
+                                    $isEnabled = $guardConfig['enabled'] ?? 0;
+                                    $statusText = $isEnabled 
+                                        ? gp247_language_render('Plugins/LoginSocial::lang.admin.guard_enabled')
+                                        : gp247_language_render('Plugins/LoginSocial::lang.admin.guard_disabled');
+                                @endphp
+                                <span class="badge badge-{{ $isEnabled ? 'success' : 'secondary' }}" title="{{ $statusText }}">
+                                    {{ $guard }}
+                                    @if($isEnabled)
+                                        <i class="fas fa-check-circle"></i>
+                                    @else
+                                        <i class="fas fa-times-circle"></i>
+                                    @endif
+                                </span>
                             @endforeach
                         </div>
                         <small class="form-text text-muted">
@@ -160,6 +174,22 @@
     pre code {
         font-size: 12px;
         line-height: 1.5;
+    }
+    .badge {
+        font-size: 14px;
+        padding: 8px 12px;
+        margin-right: 8px;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+    .badge i {
+        margin-left: 5px;
+    }
+    .badge-success {
+        background-color: #28a745;
+    }
+    .badge-secondary {
+        background-color: #6c757d;
     }
 </style>
 @endpush

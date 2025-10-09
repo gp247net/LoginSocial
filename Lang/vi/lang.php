@@ -6,7 +6,9 @@ return [
         'title' => 'Đăng nhập mạng xã hội',
         'description' => 'Cấu hình các nhà cung cấp đăng nhập mạng xã hội cho ứng dụng. Người dùng có thể đăng nhập bằng tài khoản mạng xã hội.',
         'available_guards' => 'Guards có sẵn',
-        'guards_help' => 'Các guards này có thể được sử dụng cho đăng nhập mạng xã hội. Chỉ định guard trong URL đăng nhập.',
+        'guards_help' => 'Các guards này có thể được sử dụng cho đăng nhập mạng xã hội. Chỉ định guard trong URL đăng nhập. Badge màu xanh là đã bật, màu xám là đã tắt (cấu hình trong config.php).',
+        'guard_enabled' => 'Đã bật',
+        'guard_disabled' => 'Đã tắt',
         'enable_provider' => 'Bật đăng nhập :provider',
         'client_id' => 'Client ID / App ID',
         'client_secret' => 'Client Secret / App Secret',
@@ -37,6 +39,7 @@ return [
     
     // Thông báo frontend
     'provider_not_enabled' => 'Nhà cung cấp đăng nhập này chưa được bật hoặc cấu hình chưa đúng.',
+    'guard_not_enabled' => 'Phương thức xác thực này không khả dụng hoặc cấu hình chưa đúng.',
     'invalid_guard' => 'Guard xác thực không hợp lệ.',
     'account_inactive' => 'Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.',
     'create_user_failed' => 'Không thể tạo tài khoản người dùng. Vui lòng thử lại.',

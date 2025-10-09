@@ -6,7 +6,9 @@ return [
         'title' => 'Social Login',
         'description' => 'Configure social media login providers for your application. Users can login using their social media accounts.',
         'available_guards' => 'Available Guards',
-        'guards_help' => 'These guards can be used for social login. Specify the guard in the login URL.',
+        'guards_help' => 'These guards can be used for social login. Specify the guard in the login URL. Green badges are enabled, gray badges are disabled (configured in config.php).',
+        'guard_enabled' => 'Enabled',
+        'guard_disabled' => 'Disabled',
         'enable_provider' => 'Enable :provider Login',
         'client_id' => 'Client ID / App ID',
         'client_secret' => 'Client Secret / App Secret',
@@ -37,6 +39,7 @@ return [
     
     // Frontend messages
     'provider_not_enabled' => 'This login provider is not enabled or configured properly.',
+    'guard_not_enabled' => 'This authentication method is not available or configured properly.',
     'invalid_guard' => 'Invalid authentication guard specified.',
     'account_inactive' => 'Your account is inactive. Please contact administrator.',
     'create_user_failed' => 'Failed to create user account. Please try again.',

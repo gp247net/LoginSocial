@@ -23,7 +23,7 @@ class ExtensionModel
             Schema::create('social_accounts', function (\Illuminate\Database\Schema\Blueprint $table) {
                 $table->id();
                 $table->string('user_type'); // Guard type: admin, customer, vendor, pmo
-                $table->unsignedBigInteger('user_id'); // User ID from respective table
+                $table->uuid('user_id'); // User ID from respective table
                 $table->string('provider'); // facebook, google, github, etc.
                 $table->string('provider_id'); // Provider's user ID
                 $table->string('avatar')->nullable(); // User avatar from provider
