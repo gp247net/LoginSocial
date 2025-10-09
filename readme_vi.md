@@ -437,7 +437,6 @@ Plugin hỗ trợ các guards sau:
 
 - Email: support@gp247.net
 - Website: https://gp247.net
-- Documentation: https://gp247.net/docs
 
 ## License
 

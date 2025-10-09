@@ -38,7 +38,6 @@ composer require laravel/socialite
 
 ### Step 3: Configure OAuth Providers
 
-> **Note**: LoginSocial plugin uses database-only configuration, no ENV variables needed.
 
 #### Configure Facebook Login
 
@@ -81,7 +80,6 @@ composer require laravel/socialite
 4. Verify the Redirect URL (callback URL) is correct
 5. Click "Save Configuration"
 
-> **Important**: All configurations are stored in database, no ENV variables setup required.
 
 ## Security Configuration
 
@@ -437,7 +435,6 @@ The plugin supports the following guards:
 
 - Email: support@gp247.net
 - Website: https://gp247.net
-- Documentation: https://gp247.net/docs
 
 ## License
 
