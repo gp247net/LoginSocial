@@ -99,15 +99,18 @@ class SocialAuthController extends RootFrontController
                 return redirect('/')->with('error', gp247_language_render('Plugins/LoginSocial::lang.invalid_guard'));
             }
 
+            // Get model class for this guard
+            $modelClass = $guardConfig['model'];
+
             // Find or create social account
             $socialAccount = SocialAccount::where('provider', $provider)
                 ->where('provider_id', $providerUser->getId())
-                ->where('user_type', $guard)
+                ->where('user_type', $modelClass)
                 ->first();
 
             if ($socialAccount) {
-                // Login existing user
-                $user = $this->getUserByGuard($guard, $socialAccount->user_id);
+                // Login existing user - use polymorphic relationship
+                $user = $socialAccount->user;
                 
                 if ($user && $user->status == 1) {
                     $this->loginUser($guard, $user);
@@ -117,13 +120,12 @@ class SocialAuthController extends RootFrontController
                 }
             } else {
                 // Check if user exists by email
-                $modelClass = $guardConfig['model'];
                 $user = $modelClass::where('email', $providerUser->getEmail())->first();
 
                 if ($user) {
                     // Link social account to existing user
                     SocialAccount::create([
-                        'user_type' => $guard,
+                        'user_type' => $modelClass,
                         'user_id' => $user->id,
                         'provider' => $provider,
                         'provider_id' => $providerUser->getId(),
@@ -143,7 +145,7 @@ class SocialAuthController extends RootFrontController
                     if ($newUser) {
                         // Create social account
                         SocialAccount::create([
-                            'user_type' => $guard,
+                            'user_type' => $modelClass,
                             'user_id' => $newUser->id,
                             'provider' => $provider,
                             'provider_id' => $providerUser->getId(),
@@ -161,21 +163,6 @@ class SocialAuthController extends RootFrontController
             gp247_report('LoginSocial: Handle provider callback failed: ' . $e->getMessage());
             return redirect('/')->with('error', $e->getMessage());
         }
-    }
-
-    /**
-     * Get user by guard and ID
-     *
-     * @param string $guard
-     * @param int $userId
-     * @return mixed
-     */
-    protected function getUserByGuard($guard, $userId)
-    {
-        $guardConfig = config('Plugins/LoginSocial.guards.' . $guard);
-        $modelClass = $guardConfig['model'];
-        
-        return $modelClass::find($userId);
     }
 
     /**

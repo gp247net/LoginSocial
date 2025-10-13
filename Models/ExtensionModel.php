@@ -22,7 +22,7 @@ class ExtensionModel
         if (!Schema::hasTable('social_accounts')) {
             Schema::create('social_accounts', function (\Illuminate\Database\Schema\Blueprint $table) {
                 $table->id();
-                $table->string('user_type'); // Guard type: admin, customer, vendor, pmo
+                $table->string('user_type'); // Polymorphic type: Model class name (FQCN)
                 $table->uuid('user_id'); // User ID from respective table
                 $table->string('provider'); // facebook, google, github, etc.
                 $table->string('provider_id'); // Provider's user ID

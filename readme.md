@@ -102,21 +102,21 @@ If you need to enable social login for other guards (admin, vendor, pmo), you mu
 ```php
 'guards' => [
     'admin' => [
-        'model' => '\GP247\Core\Models\AdminUser',
+        'model' => 'GP247\Core\Models\AdminUser',
         'redirect_after_login' => 'admin.home',
         'table' => 'users',
         'enabled' => 1, // Change from 0 to 1 to enable
         'status_default' => 0, // Default status for new users (0=inactive, 1=active)
     ],
     'customer' => [
-        'model' => '\GP247\Shop\Models\ShopCustomer',
+        'model' => 'GP247\Shop\Models\ShopCustomer',
         'redirect_after_login' => 'front.home',
         'table' => 'shop_customer',
         'enabled' => 1, // Already enabled by default
         'status_default' => 1, // New customers are active by default
     ],
     'vendor' => [
-        'model' => '\App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
+        'model' => 'App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
         'redirect_after_login' => 'vendor_admin.home',
         'table' => 'vendor_users',
         'enabled' => 0, // Disabled by default
@@ -385,43 +385,6 @@ The plugin supports the following guards:
 1. Check Client ID and Client Secret
 2. Check Redirect URL matches OAuth app configuration
 3. Ensure OAuth app is approved/published
-
-## Customization
-
-### Add New Provider
-
-1. Install corresponding Socialite provider (if needed)
-2. Add configuration to `config.php`:
-
-```php
-'providers' => [
-    'linkedin' => [
-        'enabled' => env('LINKEDIN_ENABLED', false),
-        'client_id' => env('LINKEDIN_CLIENT_ID'),
-        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
-        'redirect' => env('LINKEDIN_REDIRECT_URL'),
-    ],
-],
-```
-
-3. Update Routes to support new provider
-4. Add corresponding language strings
-
-### Add New Guard
-
-1. Add guard configuration to `config.php`:
-
-```php
-'guards' => [
-    'your_guard' => [
-        'model' => '\App\Models\YourModel',
-        'redirect_after_login' => 'your.route',
-        'table' => 'your_table',
-    ],
-],
-```
-
-2. Update `createUserByGuard()` method in `SocialAuthController.php` to handle user creation logic for new guard
 
 ## Security
 

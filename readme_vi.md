@@ -104,21 +104,21 @@ Nếu bạn cần bật đăng nhập social cho các guard khác (admin, vendor
 ```php
 'guards' => [
     'admin' => [
-        'model' => '\GP247\Core\Models\AdminUser',
+        'model' => 'GP247\Core\Models\AdminUser',
         'redirect_after_login' => 'admin.home',
         'table' => 'users',
         'enabled' => 1, // Đổi từ 0 sang 1 để bật
         'status_default' => 0, // Trạng thái mặc định cho user mới (0=chưa kích hoạt, 1=đã kích hoạt)
     ],
     'customer' => [
-        'model' => '\GP247\Shop\Models\ShopCustomer',
+        'model' => 'GP247\Shop\Models\ShopCustomer',
         'redirect_after_login' => 'front.home',
         'table' => 'shop_customer',
         'enabled' => 1, // Đã được bật mặc định
         'status_default' => 1, // Customer mới được kích hoạt ngay
     ],
     'vendor' => [
-        'model' => '\App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
+        'model' => 'App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
         'redirect_after_login' => 'vendor_admin.home',
         'table' => 'vendor_users',
         'enabled' => 0, // Tắt mặc định
@@ -387,43 +387,6 @@ Plugin hỗ trợ các guards sau:
 1. Kiểm tra Client ID và Client Secret
 2. Kiểm tra Redirect URL khớp với cấu hình trong OAuth app
 3. Đảm bảo ứng dụng OAuth đã được approved/published
-
-## Tùy chỉnh
-
-### Thêm Provider mới
-
-1. Cài đặt Socialite provider tương ứng (nếu cần)
-2. Thêm cấu hình vào `config.php`:
-
-```php
-'providers' => [
-    'linkedin' => [
-        'enabled' => env('LINKEDIN_ENABLED', false),
-        'client_id' => env('LINKEDIN_CLIENT_ID'),
-        'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
-        'redirect' => env('LINKEDIN_REDIRECT_URL'),
-    ],
-],
-```
-
-3. Cập nhật Routes để hỗ trợ provider mới
-4. Thêm ngôn ngữ tương ứng
-
-### Thêm Guard mới
-
-1. Thêm cấu hình guard vào `config.php`:
-
-```php
-'guards' => [
-    'your_guard' => [
-        'model' => '\App\Models\YourModel',
-        'redirect_after_login' => 'your.route',
-        'table' => 'your_table',
-    ],
-],
-```
-
-2. Cập nhật phương thức `createUserByGuard()` trong `SocialAuthController.php` để xử lý logic tạo user cho guard mới
 
 ## Bảo mật
 
