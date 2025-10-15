@@ -8,6 +8,7 @@ use GP247\Front\Controllers\RootFrontController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -194,6 +195,16 @@ class SocialAuthController extends RootFrontController
         }
         if ($guard === 'admin') {
             $userData['username'] = $providerUser->getEmail();
+        }
+
+        // If status is active (1) and table has email_verified_at column, set it to current timestamp
+        if ($status == 1) {
+            $model = new $modelClass;
+            $tableName = $model->getTable();
+            
+            if (Schema::hasColumn($tableName, 'email_verified_at')) {
+                $userData['email_verified_at'] = now();
+            }
         }
 
         return $modelClass::create($userData);
