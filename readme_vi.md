@@ -106,21 +106,18 @@ Nếu bạn cần bật đăng nhập social cho các guard khác (admin, vendor
     'admin' => [
         'model' => 'GP247\Core\Models\AdminUser',
         'redirect_after_login' => 'admin.home',
-        'table' => 'users',
         'enabled' => 1, // Đổi từ 0 sang 1 để bật
         'status_default' => 0, // Trạng thái mặc định cho user mới (0=chưa kích hoạt, 1=đã kích hoạt)
     ],
     'customer' => [
         'model' => 'GP247\Shop\Models\ShopCustomer',
         'redirect_after_login' => 'front.home',
-        'table' => 'shop_customer',
         'enabled' => 1, // Đã được bật mặc định
         'status_default' => 1, // Customer mới được kích hoạt ngay
     ],
     'vendor' => [
         'model' => 'App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
         'redirect_after_login' => 'vendor_admin.home',
-        'table' => 'vendor_users',
         'enabled' => 0, // Tắt mặc định
         'status_default' => 0, // Vendor mới cần được duyệt
     ],
@@ -134,7 +131,6 @@ Nếu bạn cần bật đăng nhập social cho các guard khác (admin, vendor
 - **`status_default`**: Trạng thái mặc định cho user mới tạo (0 = chưa kích hoạt/cần duyệt, 1 = kích hoạt ngay)
 - **`model`**: Class model của user cho guard này
 - **`redirect_after_login`**: Tên route để chuyển hướng sau khi đăng nhập thành công
-- **`table`**: Tên bảng trong database
 
 > ⚠️ **Cảnh Báo Bảo Mật**: Việc bật đăng nhập social cho admin, vendor hoặc các guard có quyền cao khác có thể gây rủi ro bảo mật. Chỉ bật khi bạn hiểu rõ hậu quả và đã có các biện pháp bảo mật phù hợp.
 

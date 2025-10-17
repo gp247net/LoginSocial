@@ -104,21 +104,18 @@ If you need to enable social login for other guards (admin, vendor, pmo), you mu
     'admin' => [
         'model' => 'GP247\Core\Models\AdminUser',
         'redirect_after_login' => 'admin.home',
-        'table' => 'users',
         'enabled' => 1, // Change from 0 to 1 to enable
         'status_default' => 0, // Default status for new users (0=inactive, 1=active)
     ],
     'customer' => [
         'model' => 'GP247\Shop\Models\ShopCustomer',
         'redirect_after_login' => 'front.home',
-        'table' => 'shop_customer',
         'enabled' => 1, // Already enabled by default
         'status_default' => 1, // New customers are active by default
     ],
     'vendor' => [
         'model' => 'App\GP247\Plugins\MultiVendorPro\Models\VendorUser',
         'redirect_after_login' => 'vendor_admin.home',
-        'table' => 'vendor_users',
         'enabled' => 0, // Disabled by default
         'status_default' => 0, // New vendors require approval
     ],
@@ -132,7 +129,6 @@ If you need to enable social login for other guards (admin, vendor, pmo), you mu
 - **`status_default`**: Default status for newly created users (0 = inactive/requires approval, 1 = active immediately)
 - **`model`**: User model class for this guard
 - **`redirect_after_login`**: Route name to redirect after successful login
-- **`table`**: Database table name
 
 > ⚠️ **Security Warning**: Enabling social login for admin, vendor, or other privileged guards poses security risks. Only enable if you understand the implications and have proper security measures in place.
 
