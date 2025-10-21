@@ -22,7 +22,7 @@ return [
             'enabled' => 0, // Plugin will not load if this is 0
             'status_default' => 0, // Default status for new users
         ],
-        'pmo' => [
+        'pmo_partner' => [
             'model' => 'App\GP247\Plugins\PmoPartner\Models\PmoPartnerUser', // Change to your PMO model
             'redirect_after_login' => 'partner.home',
             'enabled' => 0, // Plugin will not load if this is 0
